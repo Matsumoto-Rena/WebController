@@ -8,6 +8,47 @@
         <script type="text/javascript" src="JS/script.js"></script>
     </head>
     <body>
-       <h1> とりあえず作ってみたサイト(/・ω・)/ </h1> 
+         <h1>ESP32 Webサーバーへようこそ(/・ω・)/</h1>
+         <p>LEDの状態: <strong>%STATE%</strong></p>
+         <button onclick="connectBluetooth()">Bluetooth接続</button>
+         <p id="deviceName">未接続</p>
+         <button onclick="sendData(1)">ON</button>
+         <button onclick="sendData(0)">OFF</button>
     </body>
+
+<script>
+  async function connectBluetooth() {
+    try {
+      const device = await navigator.bluetooth.requestDevice({
+        acceptAllDevices: true,
+        optionalServices: ['battery_service'] // 必要に応じて変更
+      });
+
+      const server = await device.gatt.connect();
+      console.log("接続成功:", device.name);
+
+      // ここでサービスやキャラクタリスティックにアクセスできる
+    } catch (error) {
+      console.error("接続失敗:", error);
+    }
+  }
+</script>
+
+<script>
+  function sendData(value) {
+    fetch(`/send?val=${value}`)
+      .then(response => {
+        if (!response.ok) throw new Error('送信失敗');
+        return response.text();
+      })
+      .then(data => {
+        console.log('送信成功:', data);
+      })
+      .catch(error => {
+        console.error('エラー:', error);
+      });
+  }
+</script>
+
+
 </html>
