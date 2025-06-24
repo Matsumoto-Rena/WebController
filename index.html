@@ -1,54 +1,85 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title> (/・ω・)/ </title>
-        <link rel="stylesheet" href="css/style.css">
-        <script type="text/javascript" src="JS/script.js"></script>
-    </head>
-    <body>
-         <h1>ESP32 Webサーバーへようこそ(/・ω・)/</h1>
-         <p>LEDの状態: <strong>%STATE%</strong></p>
-         <button onclick="connectBluetooth()">Bluetooth接続</button>
-         <p id="deviceName">未接続</p>
-         <button onclick="sendData(1)">ON</button>
-         <button onclick="sendData(0)">OFF</button>
-    </body>
-
-<script>
-  async function connectBluetooth() {
-    try {
-      const device = await navigator.bluetooth.requestDevice({
-        acceptAllDevices: true,
-        optionalServices: ['battery_service'] // 必要に応じて変更
-      });
-
-      const server = await device.gatt.connect();
-      console.log("接続成功:", device.name);
-
-      // ここでサービスやキャラクタリスティックにアクセスできる
-    } catch (error) {
-      console.error("接続失敗:", error);
+<head>
+  <meta charset="utf-8">
+  <title>ESP32 BLE コントローラー</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      padding: 50px;
+      background-color: #f4f6f8;
     }
-  }
-</script>
+    h1 {
+      color: #333;
+    }
+    button {
+      font-size: 18px;
+      padding: 12px 24px;
+      margin: 10px;
+      border: none;
+      border-radius: 6px;
+      background-color: #0078D7;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #005a9e;
+    }
+    #status {
+      margin-top: 20px;
+      font-size: 16px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
 
-<script>
-  function sendData(value) {
-    fetch(`/send?val=${value}`)
-      .then(response => {
-        if (!response.ok) throw new Error('送信失敗');
-        return response.text();
-      })
-      .then(data => {
-        console.log('送信成功:', data);
-      })
-      .catch(error => {
-        console.error('エラー:', error);
-      });
-  }
-</script>
+  <h1>ESP32 BLE コントローラー</h1>
 
+  <button onclick="connect()">Bluetooth接続</button>
+  <button onclick="writeLED('1')">LED ON</button>
+  <button onclick="writeLED('0')">LED OFF</button>
 
+  <p id="status">未接続</p>
+
+  <script>
+    let device, characteristic;
+
+    async function connect() {
+      try {
+        device = await navigator.bluetooth.requestDevice({
+          filters: [{ name: 'ESP32-BLE' }],
+          optionalServices: ['12345678-1234-5678-1234-56789abcdef0']
+        });
+
+        document.getElementById("status").textContent = `接続中: ${device.name}`;
+
+        const server = await device.gatt.connect();
+        const service = await server.getPrimaryService('12345678-1234-5678-1234-56789abcdef0');
+        characteristic = await service.getCharacteristic('abcdefab-1234-5678-1234-56789abcdef0');
+
+        document.getElementById("status").textContent = `✅ 接続成功: ${device.name}`;
+      } catch (error) {
+        console.error("接続エラー:", error);
+        document.getElementById("status").textContent = "❌ 接続失敗";
+      }
+    }
+
+    async function writeLED(value) {
+      if (!characteristic) {
+        alert("先にBluetooth接続してください");
+        return;
+      }
+      try {
+        const encoder = new TextEncoder();
+        await characteristic.writeValue(encoder.encode(value));
+        console.log("送信成功:", value);
+      } catch (error) {
+        console.error("送信エラー:", error);
+      }
+    }
+  </script>
+
+</body>
 </html>

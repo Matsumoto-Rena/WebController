@@ -1,34 +1,32 @@
-*{
-    margin: 0;
-    padding: 0;
-}
-
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f9f9f9;
   text-align: center;
-  background-color: #f0f0f0;
-}
-
-#wrapper {
-    width: 80%;
-    margin: 0 auto 0 20px;
+  padding: 40px;
 }
 
 h1 {
   color: #333;
+  margin-bottom: 30px;
 }
 
 button {
-  padding: 15px 30px;
-  margin: 10px;
+  padding: 12px 24px;
   font-size: 18px;
-  border: none;
-  border-radius: 5px;
-  background-color: #4CAF50;
+  background-color: #0078D7;
   color: white;
+  border: none;
+  border-radius: 6px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 button:hover {
-  background-color: #45a049;
+  background-color: #005a9e;
+}
+
+#deviceName {
+  margin-top: 20px;
+  font-size: 16px;
+  color: #555;
 }

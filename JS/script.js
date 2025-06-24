@@ -4,10 +4,11 @@ async function connectBluetooth() {
       acceptAllDevices: true
     });
 
-    document.getElementById("deviceName").textContent = `接続中: ${device.name || "名前なしデバイス"}`;
     const server = await device.gatt.connect();
-    console.log("接続成功:", device.name);
+    console.log("接続されたデバイス名:", device.name);
+    document.getElementById("deviceName").textContent = `接続中: ${device.name || "名前なしデバイス"}`;
   } catch (error) {
     console.error("接続失敗:", error);
   }
 }
+
