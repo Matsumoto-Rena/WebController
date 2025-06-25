@@ -3,35 +3,7 @@
 <head>
   <meta charset="utf-8">
   <title>ESP32 BLE コントローラー</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      text-align: center;
-      padding: 50px;
-      background-color: #f4f6f8;
-    }
-    h1 {
-      color: #333;
-    }
-    button {
-      font-size: 18px;
-      padding: 12px 24px;
-      margin: 10px;
-      border: none;
-      border-radius: 6px;
-      background-color: #0078D7;
-      color: white;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #005a9e;
-    }
-    #status {
-      margin-top: 20px;
-      font-size: 16px;
-      color: #555;
-    }
-  </style>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
@@ -43,43 +15,6 @@
 
   <p id="status">未接続</p>
 
-  <script>
-    let device, characteristic;
-
-    async function connect() {
-      try {
-        device = await navigator.bluetooth.requestDevice({
-          filters: [{ name: 'ESP32-BLE' }],
-          optionalServices: ['12345678-1234-5678-1234-56789abcdef0']
-        });
-
-        document.getElementById("status").textContent = `接続中: ${device.name}`;
-
-        const server = await device.gatt.connect();
-        const service = await server.getPrimaryService('12345678-1234-5678-1234-56789abcdef0');
-        characteristic = await service.getCharacteristic('abcdefab-1234-5678-1234-56789abcdef0');
-
-        document.getElementById("status").textContent = `✅ 接続成功: ${device.name}`;
-      } catch (error) {
-        console.error("接続エラー:", error);
-        document.getElementById("status").textContent = "❌ 接続失敗";
-      }
-    }
-
-    async function writeLED(value) {
-      if (!characteristic) {
-        alert("先にBluetooth接続してください");
-        return;
-      }
-      try {
-        const encoder = new TextEncoder();
-        await characteristic.writeValue(encoder.encode(value));
-        console.log("送信成功:", value);
-      } catch (error) {
-        console.error("送信エラー:", error);
-      }
-    }
-  </script>
-
+  <script src="js/script.js"></script>
 </body>
 </html>
